@@ -19,8 +19,8 @@ import static org.mockito.Mockito.when;
 public class BurgerTest {
 
     private Burger burger;
-    private Ingredient ingredient1;
-    private Ingredient ingredient2;
+    private Ingredient ingredientFirst;
+    private Ingredient ingredientSecond;
 
     // Параметры для теста getPrice
     private final float bunPrice;
@@ -37,11 +37,11 @@ public class BurgerTest {
     @Parameterized.Parameters(name = "bun: {0}, ingredients: {1}, expected total: {2}")
     public static Collection<Object[]> getPriceData() {
         return Arrays.asList(new Object[][]{
-                {988f, new float[]{}, 1976f},                   // только булка
-                {1255f, new float[]{90f}, 2600f},                 // булка + 1 ингредиент
-                {100f, new float[]{30f, 40f}, 270f},            // булка + 2 ингредиента
-                {100f, new float[]{10f, 20f, 30f}, 260f},      // булка + 3 ингредиента
-                {100f, new float[]{40f, 20f, 40f, 30f}, 330f}, // булка + 4 ингредиента
+                {100f, new float[]{}, 200f},                        // только булка
+                {200f, new float[]{100f}, 500f},                    // булка + 1 ингредиент
+                {300f, new float[]{100f, 200f}, 900f},              // булка + 2 ингредиента
+                {100f, new float[]{100f, 200f, 300f}, 800f},        // булка + 3 ингредиента
+                {100f, new float[]{300f, 200f, 100f, 200f}, 1000f}, // булка + 4 ингредиента
         });
     }
 
@@ -57,15 +57,15 @@ public class BurgerTest {
         burger.setBuns(bun);
 
         // Дополнительные 2 ингредиента для тестов move/remove
-        ingredient1 = mock(Ingredient.class);
-        when(ingredient1.getName()).thenReturn("Ing1");
-        when(ingredient1.getPrice()).thenReturn(50f);
-        when(ingredient1.getType()).thenReturn(IngredientType.SAUCE);
+        ingredientFirst = mock(Ingredient.class);
+        when(ingredientFirst.getName()).thenReturn("Ing1");
+        when(ingredientFirst.getPrice()).thenReturn(100f);
+        when(ingredientFirst.getType()).thenReturn(IngredientType.SAUCE);
 
-        ingredient2 = mock(Ingredient.class);
-        when(ingredient2.getName()).thenReturn("Ing2");
-        when(ingredient2.getPrice()).thenReturn(60f);
-        when(ingredient2.getType()).thenReturn(IngredientType.FILLING);
+        ingredientSecond = mock(Ingredient.class);
+        when(ingredientSecond.getName()).thenReturn("Ing2");
+        when(ingredientSecond.getPrice()).thenReturn(300f);
+        when(ingredientSecond.getType()).thenReturn(IngredientType.FILLING);
     }
 
     @After
@@ -84,34 +84,34 @@ public class BurgerTest {
     // 2. Добавление ингредиента
     @Test
     public void testAddIngredient() {
-        burger.addIngredient(ingredient1);
-        assertEquals(ingredient1, burger.ingredients.get(burger.ingredients.size() - 1));
+        burger.addIngredient(ingredientFirst);
+        assertEquals(ingredientFirst, burger.ingredients.get(burger.ingredients.size() - 1));
     }
 
     // 3. Удаление ингредиента
     @Test
     public void testRemoveIngredient() {
         burger.ingredients.clear(); // Чистим список
-        burger.addIngredient(ingredient1);
-        burger.addIngredient(ingredient2);
+        burger.addIngredient(ingredientFirst);
+        burger.addIngredient(ingredientSecond);
 
         burger.removeIngredient(0);
 
         assertEquals(1, burger.ingredients.size());
-        assertEquals(ingredient2, burger.ingredients.get(0));
+        assertEquals(ingredientSecond, burger.ingredients.get(0));
     }
 
     // 4. Перемещение ингредиента
     @Test
     public void testMoveIngredient() {
         burger.ingredients.clear(); // чистим список
-        burger.addIngredient(ingredient1); // index 0
-        burger.addIngredient(ingredient2); // index 1
+        burger.addIngredient(ingredientFirst); // index 0
+        burger.addIngredient(ingredientSecond); // index 1
 
         burger.moveIngredient(0, 1);
 
-        assertEquals(ingredient2, burger.ingredients.get(0));
-        assertEquals(ingredient1, burger.ingredients.get(1));
+        assertEquals(ingredientSecond, burger.ingredients.get(0));
+        assertEquals(ingredientFirst, burger.ingredients.get(1));
     }
 
     // 5. Получение чека
@@ -120,16 +120,16 @@ public class BurgerTest {
         burger.ingredients.clear(); // чистим для предсказуемости
 
         Ingredient mockedIngredient = mock(Ingredient.class);
-        when(mockedIngredient.getName()).thenReturn("Sauce Spicy-X");
+        when(mockedIngredient.getName()).thenReturn("hot sauce");
         when(mockedIngredient.getType()).thenReturn(IngredientType.SAUCE);
-        when(mockedIngredient.getPrice()).thenReturn(90f);
+        when(mockedIngredient.getPrice()).thenReturn(100f);
 
         burger.addIngredient(mockedIngredient);
 
         String receipt = burger.getReceipt();
 
         assertTrue(receipt.contains("Test Bun"));
-        assertTrue(receipt.contains("Sauce Spicy-X"));
+        assertTrue(receipt.contains("hot sauce"));
         assertTrue(receipt.contains("Price:"));
     }
 
